@@ -48,9 +48,11 @@ cd polaris-baby
 
 1 - **Prepare your dataset**: The dataset should be a text file where the text data is used for training the model. The input file should be placed in the root directory. In the **Makefile** there is some functions to improve the dataset, like removing special characters, strings, add tags, etc.
 
-3 - **Adjust the training configuration**: The training configuration can be adjusted in the **config.py** file. The configuration includes parameters like batch size, learning rate, and number of epochs.
+2 - **Adjust the training configuration**: The training configuration can be adjusted in the **config.py** file. The configuration includes parameters like batch size, learning rate, and number of epochs.
 
 ```python
+# config.py
+
 HP = {
     "embed_dim": 64,
     "hidden_dim": 128,
@@ -69,7 +71,7 @@ HP = {
 }
 ```
 
-2 - **Run the training script**: The training script will train the model and save the trained model to the models directory. The script will also monitor performance metrics. The script can be run with the following command:
+3 - **Run the training script**: The training script will train the model and save the trained model to the models directory. The script will also monitor performance metrics. The script can be run with the following command:
 
 ```bash
 python main.py
