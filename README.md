@@ -109,7 +109,3 @@ The dataset file used for training **must be the same file** to be used for the 
 ## Model Architecture
 
 The model architecture is a simple LSTM-based language model. The model is trained to predict the next character in a sequence of characters. The model is trained using teacher forcing, where the input to the model is the sequence of characters and the target is the sequence of characters shifted by one position. The model is trained to minimize the cross-entropy loss between the predicted sequence and the target sequence. 
-
-## Contributing
-
-Contributions to Polaris Baby LLM are welcome. Please read CONTRIBUTING.md for guidelines on how to contribute.
