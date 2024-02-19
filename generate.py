@@ -45,7 +45,7 @@ class SmallRNNModel(nn.Module):
         x = self.fc(x)
         return x
 
-def top_k_top_p_filtering(logits, top_k=0, top_p=0.0, filter_value=-float('Inf')):
+def top_k_top_p_filtering(logits, top_k=99, top_p=0.9, filter_value=-float('Inf')):
     """Filter a distribution of logits using top-k and/or nucleus (top-p) filtering
        Args:
            logits: logits distribution shape (vocabulary size)
@@ -77,7 +77,7 @@ def top_k_top_p_filtering(logits, top_k=0, top_p=0.0, filter_value=-float('Inf')
         logits[indices_to_remove] = filter_value
     return logits
 
-def generate_text(seed_text, model, max_length, temperature, top_k, top_p):
+def generate_text(seed_text, model, max_length, temperature=0.9, top_k=99, top_p=0.9):
     model.eval()  # Ensure the model is in evaluation mode
     text_generated = [seed_text]
     input_eval = torch.tensor(encode(seed_text), dtype=torch.long).unsqueeze(0)  # Prepare input
