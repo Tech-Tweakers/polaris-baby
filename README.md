@@ -1,5 +1,5 @@
-<h1 align="center">Tech Tweakers - Polaris LLM </h1>
-<p align="center"><i>Learning project to build a Llama LLM model from scratch based on "Llama from Scratch" by Brian Kitano.</i></p>
+<h1 align="center">Tech Tweakers - Polaris Baby LLM </h1>
+<p align="center"><i>Learning project to build a tiny LLM model from scratch.</i></p>
 
 <div align="center">
   <a href="https://github.com/Tech-Tweakers/polaris-baby/stargazers"><img src="https://img.shields.io/github/stars/Tech-Tweakers/polaris-baby" alt="Stars Badge"/></a>
