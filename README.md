@@ -59,11 +59,10 @@ HP = {
     "num_layers": 2,
     "learning_rate": 0.0005,
     "epochs": 5,
-    "batch_size": 128,
+    "batch_size": 32,
     "loss_threshold": 0.4,
     "context_window": 128,
-    "log_interval": 64,
-    'stop_batch': 10000,     
+    "log_interval": 32,
 }
 ```
 
