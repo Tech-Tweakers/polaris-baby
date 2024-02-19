@@ -1,10 +1,6 @@
 import torch
-from torch.utils.data import DataLoader
-from torch.optim import Adam
-from torch.optim.lr_scheduler import OneCycleLR, ReduceLROnPlateau
+from torch.optim.lr_scheduler import ReduceLROnPlateau
 from torch import nn
-from dataset import TextDataset
-from model import SmallRNNModel
 from config import HP, Colors
 import pandas as pd
 import os
@@ -71,19 +67,3 @@ def train(model, dataloader, optimizer, scheduler, epochs, log_interval, start_e
         losses.append({'epoch': epoch+1, 'train_loss': avg_loss})
 
     return pd.DataFrame(losses)
-
-if __name__ == "__main__":
-    print(f"{Colors.HEADER}Training Start{Colors.ENDC}")
-
-    text_dataset = TextDataset(context_window=HP['context_window'])
-    dataloader = DataLoader(text_dataset, batch_size=HP['batch_size'], shuffle=True, num_workers=8)
-
-    model = SmallRNNModel(HP['vocab_size'], HP['embed_dim'], HP['hidden_dim'])
-    optimizer = Adam(model.parameters(), lr=HP['learning_rate'])
-    scheduler = OneCycleLR(optimizer, max_lr=HP['learning_rate'], total_steps=len(dataloader) * HP['epochs'])
-
-    train_results = train(model, dataloader, optimizer, scheduler, HP['epochs'], HP['log_interval'])
-
-    final_model_path = "small_rnn_model_final.pth"
-    torch.save(model.state_dict(), final_model_path)
-    print(f"{Colors.BOLD}{Colors.OKGREEN}Final model saved successfully at {final_model_path}{Colors.ENDC}")

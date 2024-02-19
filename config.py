@@ -21,7 +21,7 @@ HP = {
     "embed_dim": 64,
     "hidden_dim": 128,
     "num_layers": 2,
-    "learning_rate": 0.005,
+    "learning_rate": 0.05,
     "epochs": 5,
     "batch_size": 64,
     "loss_threshold": 0.4,
