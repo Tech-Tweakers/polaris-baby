@@ -11,7 +11,7 @@ def train(model, dataloader, optimizer, scheduler, epochs, log_interval, start_e
     if os.path.isfile(checkpoint_path):
         print(f"{Colors.OKBLUE}Loading checkpoint '{checkpoint_path}'{Colors.ENDC}")
         checkpoint = torch.load(checkpoint_path)
-        start_epoch = 1
+        start_epoch = checkpoint['epoch']  # Assuming 'epoch' is saved in the checkpoint.
         model.load_state_dict(checkpoint['model_state_dict'])
         optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
         
@@ -20,20 +20,16 @@ def train(model, dataloader, optimizer, scheduler, epochs, log_interval, start_e
         
         print(f"{Colors.OKGREEN}Checkpoint loaded. Resuming training from epoch {start_epoch}{Colors.ENDC}")
     else:
-        start_epoch = 0
         print(f"{Colors.WARNING}No checkpoint found at '{checkpoint_path}'. Starting training from scratch.{Colors.ENDC}")
 
     criterion = nn.CrossEntropyLoss()
     losses = []
-    global_batch_count = 0
 
     for epoch in range(start_epoch, epochs):
         model.train()
         total_loss = 0
         
         for batch_idx, (inputs, targets) in enumerate(dataloader):
-            global_batch_count += 1
-            
             optimizer.zero_grad()
             outputs = model(inputs)
             loss = criterion(outputs.transpose(1, 2), targets)
@@ -44,22 +40,23 @@ def train(model, dataloader, optimizer, scheduler, epochs, log_interval, start_e
             if scheduler and not isinstance(scheduler, ReduceLROnPlateau):
                 scheduler.step()
             
-            if global_batch_count % log_interval == 0:
-                print(f"{Colors.CYAN}Epoch: {epoch+1}, Batch: {batch_idx+1}, Loss: {loss.item():.4f}{Colors.ENDC}")
+            # Only print the log at intervals specified by log_interval.
+            if (batch_idx + 1) % log_interval == 0 or batch_idx == 0:
+                print(f"{Colors.CYAN}Epoch: {epoch+1}, Batch: {batch_idx+1}, Loss: {loss.item():.4f}{Colors.ENDC}", end='\r', flush=True)
 
-            if global_batch_count >= HP['stop_batch']:
-                print(f"{Colors.WARNING}Reached designated stopping global batch ({HP['stop_batch']}). Ending training.{Colors.ENDC}")
-                checkpoint_path = "model_checkpoint.pth"
-                torch.save({
-                    'global_batch_count': global_batch_count,
-                    'model_state_dict': model.state_dict(),
-                    'optimizer_state_dict': optimizer.state_dict(),
-                    'loss': loss.item(),
-                }, checkpoint_path)
-                print(f"{Colors.BOLD}{Colors.OKGREEN}Checkpoint saved at {checkpoint_path}{Colors.ENDC}")
-                return pd.DataFrame(losses)
+        # Print a new line to ensure checkpoint message is on a new line.
+        print()
 
-            total_loss += loss.item()
+        # Checkpoint saving message.
+        torch.save({
+            'epoch': epoch,
+            'model_state_dict': model.state_dict(),
+            'optimizer_state_dict': optimizer.state_dict(),
+            'loss': loss.item(),
+        }, checkpoint_path)
+        print(f"{Colors.BOLD}{Colors.OKGREEN}Checkpoint saved at {checkpoint_path}{Colors.ENDC}")
+
+        total_loss += loss.item()
 
         avg_loss = total_loss / len(dataloader)
         print(f"{Colors.OKGREEN}Epoch [{epoch+1}/{epochs}] completed. Avg Loss: {avg_loss:.4f}{Colors.ENDC}")
