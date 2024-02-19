@@ -113,7 +113,7 @@ def main(args):
     model = SmallRNNModel(vocab_size, embed_dim, hidden_dim)
 
     try:
-        model.load_state_dict(torch.load("small_rnn_model.pth"))
+        model.load_state_dict(torch.load("small_rnn_model_final.pth"))
         model.eval()
     except Exception as e:
         print(f"{Colors.FAIL}Error loading model: {e}{Colors.ENDC}")

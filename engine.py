@@ -1,75 +1,89 @@
-import time
-from datetime import datetime
-import pandas as pd
-from config import HP
-from config import Colors
 import torch
-import torch.nn as nn
-from train_utils import evaluate_loss, get_batches
+from torch.utils.data import DataLoader
+from torch.optim import Adam
+from torch.optim.lr_scheduler import OneCycleLR, ReduceLROnPlateau
+from torch import nn
+from dataset import TextDataset
+from model import SmallRNNModel
+from config import HP, Colors
+import pandas as pd
+import os
 
-def train(model, optimizer, scheduler, dataset_instance=HP['encoded_text'], print_logs=True):
-    model.train()
+def train(model, dataloader, optimizer, scheduler, epochs, log_interval, start_epoch=0):
+    checkpoint_path = "model_checkpoint.pth"
+
+    if os.path.isfile(checkpoint_path):
+        print(f"{Colors.OKBLUE}Loading checkpoint '{checkpoint_path}'{Colors.ENDC}")
+        checkpoint = torch.load(checkpoint_path)
+        start_epoch = 1
+        model.load_state_dict(checkpoint['model_state_dict'])
+        optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+        
+        if 'scheduler_state_dict' in checkpoint and scheduler is not None:
+            scheduler.load_state_dict(checkpoint['scheduler_state_dict'])
+        
+        print(f"{Colors.OKGREEN}Checkpoint loaded. Resuming training from epoch {start_epoch}{Colors.ENDC}")
+    else:
+        start_epoch = 0
+        print(f"{Colors.WARNING}No checkpoint found at '{checkpoint_path}'. Starting training from scratch.{Colors.ENDC}")
+
     criterion = nn.CrossEntropyLoss()
     losses = []
-    start_time = time.time()
-    print(Colors.BOLD + "Training function started at:", datetime.now())
-    print(Colors.ENDC)
-    
-    for epoch in range(HP['epochs']):
-        model.train()  # Ensure model is in training mode
-        optimizer.zero_grad()
+    global_batch_count = 0
+
+    for epoch in range(start_epoch, epochs):
+        model.train()
+        total_loss = 0
         
-        xs, ys = get_batches(dataset_instance, 'train', HP['batch_size'], HP['context_window'])
+        for batch_idx, (inputs, targets) in enumerate(dataloader):
+            global_batch_count += 1
+            
+            optimizer.zero_grad()
+            outputs = model(inputs)
+            loss = criterion(outputs.transpose(1, 2), targets)
+            loss.backward()
+            torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1)
+            optimizer.step()
+            
+            if scheduler and not isinstance(scheduler, ReduceLROnPlateau):
+                scheduler.step()
+            
+            if global_batch_count % log_interval == 0:
+                print(f"{Colors.CYAN}Epoch: {epoch+1}, Batch: {batch_idx+1}, Loss: {loss.item():.4f}{Colors.ENDC}")
+
+            if global_batch_count >= HP['stop_batch']:
+                print(f"{Colors.WARNING}Reached designated stopping global batch ({HP['stop_batch']}). Ending training.{Colors.ENDC}")
+                checkpoint_path = "model_checkpoint.pth"
+                torch.save({
+                    'global_batch_count': global_batch_count,
+                    'model_state_dict': model.state_dict(),
+                    'optimizer_state_dict': optimizer.state_dict(),
+                    'loss': loss.item(),
+                }, checkpoint_path)
+                print(f"{Colors.BOLD}{Colors.OKGREEN}Checkpoint saved at {checkpoint_path}{Colors.ENDC}")
+                return pd.DataFrame(losses)
+
+            total_loss += loss.item()
+
+        avg_loss = total_loss / len(dataloader)
+        print(f"{Colors.OKGREEN}Epoch [{epoch+1}/{epochs}] completed. Avg Loss: {avg_loss:.4f}{Colors.ENDC}")
         
-        # Start timer for forward and backward pass
-        forward_start = time.time()
-        logits = model(xs)  # Generate predictions
-        
-        # Reshape logits to [batch_size * seq_length, vocab_size]
-        # and targets to [batch_size * seq_length]
-        logits = logits.view(-1, logits.size(-1))  # Ensure logits are (N, C) where C is num_classes
-        ys = ys.view(-1)  # Flatten targets to (N,)
-        
-        loss = criterion(logits, ys)  # Compute loss using model's output and targets
-        loss.backward()
-        optimizer.step()
-        forward_end = time.time()
+        losses.append({'epoch': epoch+1, 'train_loss': avg_loss})
 
-        # Evaluate loss here to use for scheduler
-        if epoch % HP['log_interval'] == 0 or epoch == HP['epochs'] - 1:
-            criterion = nn.CrossEntropyLoss()
-            losses_dict = evaluate_loss(model, HP['encoded_text'], HP)
-            # Ensure you're extracting just the validation loss float value
-            val_loss = losses_dict['val']
-            # Pass the validation loss to the scheduler
-            scheduler.step(val_loss)
+    return pd.DataFrame(losses)
 
-            if scheduler:
-                scheduler.step(val_loss)  # Step scheduler with validation loss
+if __name__ == "__main__":
+    print(f"{Colors.HEADER}Training Start{Colors.ENDC}")
 
-            model.train()  # Switch back to training mode
-            # Log training and validation progress
-            if print_logs:
-                batch_time = time.time() - start_time
-                losses.append({'train': loss.item(), 'val': val_loss})
-                print(Colors.OKBLUE + f"Epoch {epoch} | val loss {val_loss:.3f} | "
-                      f"Time {batch_time:.3f} | "
-                      f"Forward Time {forward_end - forward_start:.3f} | "
-                      f"ETA in seconds {batch_time * (HP['epochs'] - epoch) / HP['log_interval']:.3f}" + Colors.ENDC)
-            start_time = time.time()
-    model_path = "small_rnn_model_checkpoint.pth"
+    text_dataset = TextDataset(context_window=HP['context_window'])
+    dataloader = DataLoader(text_dataset, batch_size=HP['batch_size'], shuffle=True, num_workers=8)
 
-    torch.save({
-        'epoch': epoch,
-        'model_state_dict': model.state_dict(),
-        'optimizer_state_dict': optimizer.state_dict(),
-        'scheduler_state_dict': scheduler.state_dict(),
-        'loss': loss.item(),
-    }, model_path)
-    print(f"{Colors.BOLD}{Colors.OKGREEN}Checkpoint saved at {model_path}{Colors.ENDC}")
+    model = SmallRNNModel(HP['vocab_size'], HP['embed_dim'], HP['hidden_dim'])
+    optimizer = Adam(model.parameters(), lr=HP['learning_rate'])
+    scheduler = OneCycleLR(optimizer, max_lr=HP['learning_rate'], total_steps=len(dataloader) * HP['epochs'])
 
-    print(Colors.BOLD)
-    print("Training function ended at:", datetime.now())
-    print("validation loss: ", losses[-1]['val'])
-    print(Colors.ENDC)
-    return pd.DataFrame(losses).plot()
+    train_results = train(model, dataloader, optimizer, scheduler, HP['epochs'], HP['log_interval'])
+
+    final_model_path = "small_rnn_model_final.pth"
+    torch.save(model.state_dict(), final_model_path)
+    print(f"{Colors.BOLD}{Colors.OKGREEN}Final model saved successfully at {final_model_path}{Colors.ENDC}")

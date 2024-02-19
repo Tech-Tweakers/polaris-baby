@@ -1,14 +1,18 @@
 import os
 
 class Colors:
-    HEADER = '\033[95m'
-    OKBLUE = '\033[94m'
-    OKGREEN = '\033[92m'
-    WARNING = '\033[93m'
-    FAIL = '\033[91m'
-    ENDC = '\033[0m'
-    BOLD = '\033[1m'
-    UNDERLINE = '\033[4m'
+    HEADER = '\033[95m'  # Purple
+    OKBLUE = '\033[94m'  # Blue
+    OKGREEN = '\033[92m'  # Green
+    WARNING = '\033[93m'  # Yellow
+    FAIL = '\033[91m'     # Red
+    ENDC = '\033[0m'      # Reset color
+    BOLD = '\033[1m'      # Bold text
+    UNDERLINE = '\033[4m' # Underline text
+    CYAN = '\033[96m'     # Cyan
+    WHITE = '\033[97m'    # White
+    YELLOW_BACKGROUND = '\033[43m' # Yellow background
+    BLUE_BACKGROUND = '\033[44m'   # Blue background
 
 os.environ["OMP_NUM_THREADS"] = "8"
 os.environ["MKL_NUM_THREADS"] = "8"
@@ -16,15 +20,16 @@ os.environ["MKL_NUM_THREADS"] = "8"
 HP = {
     "embed_dim": 64,
     "hidden_dim": 128,
-    "learning_rate": 0.005,
-    "epochs": 1000,
-    "batch_size": 32,
-    "loss_threshold": 0.4,
     "num_layers": 2,
-    "context_window": 64,
-    "vocab_size": None,  # To be updated after loading data
-    "vocab": None,  # To be updated after loading data
-    "val": None,  # To be updated after validation
-    "log_interval": 10,
-    "encoded_text": None,  # To be updated after loading data  
+    "learning_rate": 0.005,
+    "epochs": 5,
+    "batch_size": 64,
+    "loss_threshold": 0.4,
+    "context_window": 128,
+    "log_interval": 64,
+    "vocab_size": None,
+    "vocab": None,
+    "val": None,
+    "encoded_text": None,
+    'stop_batch': 15000,     
 }
