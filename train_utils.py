@@ -1,7 +1,7 @@
 import numpy as np
 import torch
 from torch import nn
-from config import HP
+from config import HP, CC
 
 def get_batches(encoded_text, split, batch_size, context_window, config=HP):
     data_length = len(encoded_text)
@@ -27,7 +27,7 @@ def evaluate_loss(model, criterion, dataset_instance, config=HP):
     for split in ["train", "val"]:
         losses = []
         for _ in range(10):
-            xb, yb = get_batches(HP['encoded_text'], split, config['batch_size'], config['context_window'])
+            xb, yb = get_batches(CC['encoded_text'], split, config['batch_size'], config['context_window'])
             outputs = model(xb)
             criterion = nn.CrossEntropyLoss()
             loss = criterion(outputs.transpose(1, 2), yb)

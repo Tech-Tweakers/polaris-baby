@@ -1,7 +1,7 @@
 import torch
 from torch.utils.data import Dataset
 from config import Colors
-from config import HP
+from config import CC
 
 class TextDataset(Dataset):
     def __init__(self, context_window=10):
@@ -12,8 +12,8 @@ class TextDataset(Dataset):
         self.vocab = sorted(list(set(text)))
         print(f"{Colors.OKBLUE}Vocabulary constructed. Size: {len(self.vocab)}{Colors.ENDC}")
 
-        HP.update({"vocab_size": len(self.vocab)})
-        HP.update({"vocab": self.vocab})
+        CC.update({"vocab_size": len(self.vocab)})
+        CC.update({"vocab": self.vocab})
 
         self.stoi = {ch: i for i, ch in enumerate(self.vocab)}
         self.itos = {i: ch for i, ch in enumerate(self.vocab)}
