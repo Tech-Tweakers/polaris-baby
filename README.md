@@ -57,17 +57,13 @@ HP = {
     "embed_dim": 64,
     "hidden_dim": 128,
     "num_layers": 2,
-    "learning_rate": 0.05,
+    "learning_rate": 0.0005,
     "epochs": 5,
-    "batch_size": 64,
+    "batch_size": 128,
     "loss_threshold": 0.4,
     "context_window": 128,
     "log_interval": 64,
-    "vocab_size": None,
-    "vocab": None,
-    "val": None,
-    "encoded_text": None,
-    'stop_batch': 15000,     
+    'stop_batch': 10000,     
 }
 ```
 
