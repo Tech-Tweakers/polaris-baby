@@ -12,8 +12,7 @@ def colorful_print(message, color, end=Colors.ENDC):
     print(f"{color}{message}{end}")
 
 print("")
-colorful_print("Polaris Baby v0.1.0", Colors.HEADER + Colors.BOLD)
-colorful_print("-------------------", Colors.HEADER + Colors.BOLD)
+colorful_print("Polaris Baby v0.1.0", Colors.BLUE_BACKGROUND)
 
 text_dataset = TextDataset(context_window=HP['context_window'])
 dataloader = DataLoader(text_dataset, batch_size=HP['batch_size'], shuffle=True, num_workers=8)

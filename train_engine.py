@@ -20,7 +20,7 @@ def train(model, dataloader, optimizer, scheduler, epochs, log_interval, start_e
         
         print(f"{Colors.OKGREEN}Checkpoint loaded. Resuming training from epoch {start_epoch}{Colors.ENDC}")
     else:
-        print(f"{Colors.BLUE_BACKGROUND}No checkpoint found at '{checkpoint_path}'. Starting training from scratch.{Colors.ENDC}")
+        print(f"{Colors.WARNING}No checkpoint found at '{checkpoint_path}'. Starting training from scratch.{Colors.ENDC}")
 
     criterion = nn.CrossEntropyLoss()
     losses = []
@@ -38,12 +38,13 @@ def train(model, dataloader, optimizer, scheduler, epochs, log_interval, start_e
             optimizer.step()
             
             total_loss += loss.item()
+            avg_loss = total_loss / len(dataloader)
 
             if scheduler and not isinstance(scheduler, ReduceLROnPlateau):
                 scheduler.step()
             
             if (batch_idx + 1) % log_interval == 0 or batch_idx == 0:
-                print(f"{Colors.CYAN}Epoch: {epoch}, Batch: {batch_idx+1}, Loss: {loss.item():.4f}{Colors.ENDC}", end='\r', flush=True)
+                print(f"{Colors.CYAN}Epoch: {epoch}/{epochs}, Batch: {batch_idx+1}, Val/Avg Loss: {loss.item():.4f}/{avg_loss:.4f}{Colors.ENDC}", end='\r', flush=True)
         print()
 
         torch.save({

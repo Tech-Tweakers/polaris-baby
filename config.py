@@ -8,9 +8,9 @@ HP = {
     "hidden_dim": 128,        # Hidden dimension: Size of the hidden layers in the model.
     "num_layers": 2,          # Number of layers: The number of layers in the model (e.g., in LSTM or Transformer models).
     "learning_rate": 0.0005,  # Learning rate: The step size at each iteration while moving toward a minimum of a loss function.
-    "epochs": 5,              # Epochs: The number of complete passes through the training dataset.
+    "epochs": 20,             # Epochs: The number of complete passes through the training dataset.
     "batch_size": 32,         # Batch size: The number of training examples utilized in one iteration.
-    "loss_threshold": 0.4,    # Loss threshold: A predefined threshold for the loss, used possibly for early stopping or adjusting learning rate.
+    "loss_threshold": 0.2,    # Loss threshold: A predefined threshold for the loss, used possibly for early stopping or adjusting learning rate.
     "context_window": 128,    # Context window: The size of the window of context used for models that require a fixed input size.
     "log_interval": 32,       # Log interval: The interval (in iterations) at which training progress (e.g., loss) is logged.
 }
