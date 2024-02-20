@@ -1,8 +1,8 @@
 import torch
 import argparse
-from torch import nn
 import torch.nn.functional as F
-from config import Colors
+from config import Colors, HP
+from model import SmallRNNModel
 
 # Improved error handling for file operations
 def read_file(file_path):
@@ -21,20 +21,6 @@ stoi = {ch: i for i, ch in enumerate(vocab)}
 
 def encode(s):
     return [stoi.get(ch, 0) for ch in s]  # Use get to avoid KeyErrors
-
-class SmallRNNModel(nn.Module):
-    def __init__(self, vocab_size, embed_dim, hidden_dim, dropout=0.5, num_layers=2):
-        super().__init__()
-        self.embedding = nn.Embedding(vocab_size, embed_dim)
-        self.rnn = nn.LSTM(embed_dim, hidden_dim, batch_first=True, dropout=dropout, num_layers=num_layers)
-        self.fc = nn.Linear(hidden_dim, vocab_size)
-        print(f"{Colors.OKBLUE}SmallRNNModel initialized. Embedding dim: {embed_dim}, Hidden dim: {hidden_dim}, Vocab size: {vocab_size}{Colors.ENDC}")
-
-    def forward(self, x):
-        x = self.embedding(x)
-        x, _ = self.rnn(x)
-        x = self.fc(x)
-        return x
 
 def top_k_top_p_filtering(logits, top_k=40, top_p=0.5, filter_value=-float('Inf')):
     """Filter a distribution of logits using top-k and/or nucleus (top-p) filtering
@@ -99,8 +85,8 @@ def generate_text(seed_text, model, max_length, temperature=0.7, top_k=40, top_p
 
 def main(args):
     vocab_size = len(vocab)
-    embed_dim = 64
-    hidden_dim = 128
+    embed_dim = HP['embed_dim']
+    hidden_dim = HP['hidden_dim']
     model = SmallRNNModel(vocab_size, embed_dim, hidden_dim)
 
     try:
