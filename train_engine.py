@@ -9,7 +9,7 @@ def train(model, dataloader, optimizer, scheduler, epochs, log_interval, start_e
     checkpoint_path = "model_checkpoint.pth"
 
     if os.path.isfile(checkpoint_path):
-        print(f"{Colors.OKBLUE}Loading checkpoint '{checkpoint_path}'{Colors.ENDC}")
+        print(f"{Colors.FAIL}Loading checkpoint '{checkpoint_path}'{Colors.ENDC}")
         checkpoint = torch.load(checkpoint_path)
         start_epoch = checkpoint['epoch']  # Assuming 'epoch' is saved in the checkpoint.
         model.load_state_dict(checkpoint['model_state_dict'])
@@ -20,14 +20,14 @@ def train(model, dataloader, optimizer, scheduler, epochs, log_interval, start_e
         
         print(f"{Colors.OKGREEN}Checkpoint loaded. Resuming training from epoch {start_epoch}{Colors.ENDC}")
     else:
-        print(f"{Colors.WARNING}No checkpoint found at '{checkpoint_path}'. Starting training from scratch.{Colors.ENDC}")
+        print(f"{Colors.BLUE_BACKGROUND}No checkpoint found at '{checkpoint_path}'. Starting training from scratch.{Colors.ENDC}")
 
     criterion = nn.CrossEntropyLoss()
     losses = []
 
     for epoch in range(start_epoch, epochs):
         model.train()
-        total_loss = 0
+        total_loss = 0  # Reset total loss for each epoch
         
         for batch_idx, (inputs, targets) in enumerate(dataloader):
             optimizer.zero_grad()
@@ -37,12 +37,14 @@ def train(model, dataloader, optimizer, scheduler, epochs, log_interval, start_e
             torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1)
             optimizer.step()
             
+            total_loss += loss.item()  # Accumulate loss for each batch here
+
             if scheduler and not isinstance(scheduler, ReduceLROnPlateau):
                 scheduler.step()
             
             # Only print the log at intervals specified by log_interval.
             if (batch_idx + 1) % log_interval == 0 or batch_idx == 0:
-                print(f"{Colors.CYAN}Epoch: {epoch+1}, Batch: {batch_idx+1}, Loss: {loss.item():.4f}{Colors.ENDC}", end='\r', flush=True)
+                print(f"{Colors.CYAN}Epoch: {epoch}, Batch: {batch_idx+1}, Loss: {loss.item():.4f}{Colors.ENDC}", end='\r', flush=True)
 
         # Print a new line to ensure checkpoint message is on a new line.
         print()
@@ -56,9 +58,7 @@ def train(model, dataloader, optimizer, scheduler, epochs, log_interval, start_e
         }, checkpoint_path)
         print(f"{Colors.BOLD}{Colors.OKGREEN}Checkpoint saved at {checkpoint_path}{Colors.ENDC}")
 
-        total_loss += loss.item()
-
-        avg_loss = total_loss / len(dataloader)
+        avg_loss = total_loss / len(dataloader)  # Calculate average loss correctly
         print(f"{Colors.OKGREEN}Epoch [{epoch+1}/{epochs}] completed. Avg Loss: {avg_loss:.4f}{Colors.ENDC}")
         
         losses.append({'epoch': epoch+1, 'train_loss': avg_loss})

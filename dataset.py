@@ -7,10 +7,10 @@ class TextDataset(Dataset):
     def __init__(self, context_window=10):
         with open('input.txt', 'r') as file:
             text = file.read()
-        print(f"{Colors.OKBLUE}Input text loaded. Length: {len(text)} characters.{Colors.ENDC}")
+        print(f"{Colors.OKGREEN}Input text loaded. Length: {len(text)} characters.{Colors.ENDC}")
 
         self.vocab = sorted(list(set(text)))
-        print(f"{Colors.OKBLUE}Vocabulary constructed. Size: {len(self.vocab)}{Colors.ENDC}")
+        print(f"{Colors.OKGREEN}Vocabulary constructed. Size: {len(self.vocab)}{Colors.ENDC}")
 
         CC.update({"vocab_size": len(self.vocab)})
         CC.update({"vocab": self.vocab})
@@ -22,7 +22,7 @@ class TextDataset(Dataset):
         self.encoded_text = [self.stoi[ch] for ch in text if ch in self.stoi]
         self.seq_length = context_window
 
-        print(f"{Colors.OKBLUE}TextDataset initialized. Sequence length: {context_window}, Encoded text length: {len(self.encoded_text)}{Colors.ENDC}")
+        print(f"{Colors.OKGREEN}TextDataset initialized. Sequence length: {context_window}, Encoded text length: {len(self.encoded_text)}{Colors.ENDC}")
 
     def __len__(self):
         return max(0, len(self.encoded_text) - self.seq_length)

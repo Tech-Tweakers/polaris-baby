@@ -8,7 +8,7 @@ class SmallRNNModel(nn.Module):
         self.embedding = nn.Embedding(vocab_size, embed_dim)
         self.rnn = nn.LSTM(embed_dim, hidden_dim, batch_first=True, dropout=dropout, num_layers=num_layers)
         self.fc = nn.Linear(hidden_dim, vocab_size)
-        print(f"{Colors.OKBLUE}SmallRNNModel initialized. Embedding dim: {embed_dim}, Hidden dim: {hidden_dim}, Vocab size: {vocab_size}{Colors.ENDC}")
+        print(f"{Colors.WARNING}SmallRNNModel initialized. Embedding dim: {embed_dim}, Hidden dim: {hidden_dim}, Vocab size: {vocab_size}{Colors.ENDC}")
 
     def forward(self, x):
         x = self.embedding(x)
