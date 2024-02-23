@@ -4,7 +4,6 @@ import torch.nn.functional as F
 from config import Colors, HP
 from model import SmallRNNModel
 
-# Improved error handling for file operations
 def read_file(file_path):
     try:
         with open(file_path, 'r') as file:
@@ -20,23 +19,12 @@ itos = {i: ch for i, ch in enumerate(vocab)}
 stoi = {ch: i for i, ch in enumerate(vocab)}
 
 def encode(s):
-    return [stoi.get(ch, 0) for ch in s]  # Use get to avoid KeyErrors
-
+    return [stoi.get(ch, 0) for ch in s]
 def top_k_top_p_filtering(logits, top_k=40, top_p=0.5, filter_value=-float('Inf')):
-    """Filter a distribution of logits using top-k and/or nucleus (top-p) filtering
-       Args:
-           logits: logits distribution shape (vocabulary size)
-           top_k > 0: keep only top k tokens with highest probability (top-k filtering).
-           top_p > 0.0: keep the top tokens with a cumulative probability >= top_p (nucleus filtering).
-           filter_value: The value to assign to filtered tokens, default to -float('Inf')
-       Returns:
-           logits: the filtered logits distribution of shape (vocabulary size)
-    """
-    assert logits.dim() == 1  # batch dimension 1 for single sample
+    assert logits.dim() == 1 
 
-    top_k = min(top_k, logits.size(-1))  # Safety check
+    top_k = min(top_k, logits.size(-1))
     if top_k > 0:
-        # Remove all tokens with a probability less than the last token of the top-k
         indices_to_remove = logits < torch.topk(logits, top_k)[0][..., -1, None]
         logits[indices_to_remove] = filter_value
 
@@ -44,9 +32,7 @@ def top_k_top_p_filtering(logits, top_k=40, top_p=0.5, filter_value=-float('Inf'
         sorted_logits, sorted_indices = torch.sort(logits, descending=True)
         cumulative_probs = torch.cumsum(F.softmax(sorted_logits, dim=-1), dim=-1)
 
-        # Remove tokens with cumulative probability above the threshold
         sorted_indices_to_remove = cumulative_probs > top_p
-        # Shift the indices to the right to keep also the first token above the threshold
         sorted_indices_to_remove[..., 1:] = sorted_indices_to_remove[..., :-1].clone()
         sorted_indices_to_remove[..., 0] = 0
 
@@ -55,39 +41,39 @@ def top_k_top_p_filtering(logits, top_k=40, top_p=0.5, filter_value=-float('Inf'
     return logits
 
 def generate_text(seed_text, model, max_length, temperature=0.7, top_k=40, top_p=0.3):
-    model.eval()  # Ensure the model is in evaluation mode
+    model.eval()
     text_generated = [seed_text]
-    input_eval = torch.tensor(encode(seed_text), dtype=torch.long).unsqueeze(0)  # Prepare input
+    input_eval = torch.tensor(encode(seed_text), dtype=torch.long).unsqueeze(0)
 
-    with torch.no_grad():  # Inference without tracking gradients
+    with torch.no_grad():
         for _ in range(max_length):
-            predictions = model(input_eval)[:,-1,:]  # Predict the next token
-            predictions = predictions / temperature  # Apply temperature
+            predictions = model(input_eval)[:,-1,:]
+            predictions = predictions / temperature
             filtered_logits = top_k_top_p_filtering(predictions.squeeze(), top_k=top_k, top_p=top_p)
             probs = F.softmax(filtered_logits, dim=-1)
             predicted_id = torch.multinomial(probs, num_samples=1).item()
 
-            if itos[predicted_id] == '\n\n':  
-                print("\n")  # Move to a new line after finishing the generation
+            if itos[predicted_id] == '\n':  
+                print("\n")
                 break
 
             generated_character = itos[predicted_id]
-            print(generated_character, end='', flush=True)  # Print in real time without adding a new line
+            print(generated_character, end='', flush=True)
 
-            # Prepare the next input batch
             predicted_id_tensor = torch.tensor([[predicted_id]], dtype=torch.long)
             input_eval = torch.cat([input_eval, predicted_id_tensor], dim=1)
 
-            # Append the generated character for return value
             text_generated.append(generated_character)
 
     return ''.join(text_generated)
 
 def main(args):
-    vocab_size = len(vocab)
+    vocab_size = 1800
     embed_dim = HP['embed_dim']
     hidden_dim = HP['hidden_dim']
-    model = SmallRNNModel(vocab_size, embed_dim, hidden_dim)
+    dropout = HP['dropout']
+    num_layers = HP['num_layers']
+    model = SmallRNNModel(vocab_size, embed_dim, hidden_dim, dropout, num_layers)
 
     try:
         model.load_state_dict(torch.load("small_rnn_model_final.pth"))
@@ -96,7 +82,7 @@ def main(args):
         print(f"{Colors.FAIL}Error loading model: {e}{Colors.ENDC}")
         return
 
-    generated_text = generate_text(args.seed_text, model, args.max_length, args.temperature, args.top_k, args.top_p)
+    generate_text(args.seed_text, model, args.max_length, args.temperature, args.top_k, args.top_p)
     print(f"\n")
 
 if __name__ == "__main__":

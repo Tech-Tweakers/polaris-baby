@@ -80,7 +80,7 @@ After training, use the generate.py script for generating text:
 
 2 - Run the inference script:
 
-```bash
+```
 usage: generate.py [-h] [--seed_text SEED_TEXT] [--max_length MAX_LENGTH] [--temperature TEMPERATURE] [--top_k TOP_K] [--top_p TOP_P]
 
 Generate text using a trained model.
