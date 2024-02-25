@@ -22,6 +22,7 @@ Polaris Baby is a custom language model developed using PyTorch. This project en
 | Original Input | Latest Inference |
 | -------------- | ---------------- |
 | ![Original Input](docs/original-input.png) | ![Latest Inference](docs/latest-inference.png) |
+Model is memorizing the dataset and still not generalizing well.
 
 ## Overview
 
