@@ -2,8 +2,8 @@ import torch
 from torch.utils.data import DataLoader
 from torch.optim import Adam
 from torch.optim.lr_scheduler import OneCycleLR
-from dataset import TextDataset, load_embeddings
-from model import SmallRNNModel
+from dataset import TextDataset
+from model import EnhancedRNNModel
 from config import HP, CC, Colors
 from train_engine import train
 from datetime import datetime
@@ -18,13 +18,8 @@ print(f"{Colors.BLUE_BACKGROUND}{Colors.BOLD} - Tech Tweakers - Polaris Baby v0.
 text_dataset = TextDataset(context_window=HP['context_window'])
 dataloader = DataLoader(text_dataset, batch_size=HP['batch_size'], shuffle=True, num_workers=8)
 
-# Load your pre-trained embeddings based on your vocabulary
-embedding_dim = HP['embed_dim']  # Ensure this matches your pre-trained embedding dimensions
-pretrained_embeddings = load_embeddings('word2vec_model', text_dataset.vocab)
-
-
-# Initialize model with pre-trained embeddings
-model = SmallRNNModel(
+# Initialize model with pre-trained embeddings from TextDataset
+model = EnhancedRNNModel(
     vocab_size=CC['vocab_size'],
     embed_dim=HP['embed_dim'],
     hidden_dim=HP['hidden_dim'],
@@ -46,4 +41,3 @@ print(f"{Colors.BLUE_BACKGROUND}{Colors.BOLD}Finished Training Session at: {trai
 final_model_path = "small_rnn_model_final.pth"
 torch.save(model.state_dict(), final_model_path)
 print(f"{Colors.BLUE_BACKGROUND}{Colors.BOLD}Final model saved successfully at {final_model_path} {Colors.ENDC}")
-
