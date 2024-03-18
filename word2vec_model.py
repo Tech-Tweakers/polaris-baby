@@ -1,7 +1,8 @@
 from gensim.models import Word2Vec
 from nltk.tokenize import sent_tokenize, word_tokenize
 import nltk
-nltk.download('punkt')
+from config import Colors
+nltk.download('punkt', quiet=True)
 
 class Word2VecTrainer:
     def __init__(self, input_file, vector_size=64, window=5, min_count=3, workers=4):
@@ -27,4 +28,4 @@ class Word2VecTrainer:
         model = Word2Vec(sentences=tokenized_corpus, vector_size=self.vector_size, 
                          window=self.window, min_count=self.min_count, workers=self.workers)
         model.save("word2vec.model")
-        print("Model trained and saved successfully.")
+        print(Colors.WARNING, "Vocab model trained and saved successfully.", Colors.ENDC)

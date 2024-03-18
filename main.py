@@ -18,13 +18,13 @@ print(f"{Colors.BLUE_BACKGROUND}{Colors.BOLD} - Tech Tweakers - Polaris Baby v0.
 text_dataset = TextDataset(context_window=HP['context_window'])
 dataloader = DataLoader(text_dataset, batch_size=HP['batch_size'], shuffle=True, num_workers=8)
 
-# Initialize model with pre-trained embeddings from TextDataset
 model = EnhancedRNNModel(
     vocab_size=CC['vocab_size'],
     embed_dim=HP['embed_dim'],
     hidden_dim=HP['hidden_dim'],
     dropout=HP['dropout'],
     num_layers=HP['num_layers'],
+    num_heads=HP['num_heads'],
     pretrained_embeddings=CC['weights_matrix']
 )
 optimizer = Adam(model.parameters(), lr=HP['learning_rate'])

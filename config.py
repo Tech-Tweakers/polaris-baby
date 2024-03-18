@@ -1,14 +1,14 @@
 HP = {
     "embed_dim": 64,          # Embedding dimension: Size of the embedding vectors.
     "hidden_dim": 128,        # Hidden dimension: Size of the hidden layers in the model.
-    "num_layers": 6,          # Number of layers: The number of layers in the model (e.g., in LSTM or Transformer models).
-    "learning_rate": 0.0005,  # Learning rate: The step size at each iteration while moving toward a minimum of a loss function.
-    "epochs": 30,             # Epochs: The number of complete passes through the training dataset.
-    "batch_size": 128,         # Batch size: The number of training examples utilized in one iteration.
-    "loss_threshold": 0.2,    # Loss threshold: A predefined threshold for the loss, used possibly for early stopping or adjusting learning rate.
-    "context_window": 128,     # Context window: The size of the window of context used for models that require a fixed input size.
-    "log_interval": 128,       # Log interval: The interval (in iterations) at which training progress (e.g., loss) is logged.
-    "dropout": 0.4,           # Dropout: The probability of dropout for regularization in the model.
+    "num_layers": 4,          # Number of layers: The number of layers in the model (e.g., in LSTM or Transformer models).
+    "num_heads": 4,           # Number of heads: The number of heads in the multi-head attention mechanism.
+    "learning_rate": 0.008,   # Learning rate: The step size at each iteration while moving toward a minimum of a loss function.
+    "epochs": 5,              # Epochs: The number of complete passes through the training dataset.
+    "batch_size": 32,         # Batch size: The number of training examples utilized in one iteration.
+    "context_window": 32,     # Context window: The size of the window of context used for models that require a fixed input size.
+    "log_interval": 16,       # Log interval: The interval (in iterations) at which training progress (e.g., loss) is logged.
+    "dropout": 0.2,           # Dropout: The probability of dropout for regularization in the model.
 }
 
 CC = {
