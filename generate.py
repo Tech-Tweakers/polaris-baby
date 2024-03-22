@@ -2,7 +2,7 @@ import torch
 import argparse
 import torch.nn.functional as F
 from config import Colors, HP
-from model import SmallRNNModel
+from model import EnhancedRNNModel
 
 def read_file(file_path):
     try:
@@ -73,7 +73,8 @@ def main(args):
     hidden_dim = HP['hidden_dim']
     dropout = HP['dropout']
     num_layers = HP['num_layers']
-    model = SmallRNNModel(vocab_size, embed_dim, hidden_dim, dropout, num_layers)
+    num_heads = HP['num_heads']
+    model = EnhancedRNNModel(vocab_size, embed_dim, hidden_dim, dropout, num_layers, num_heads)
 
     try:
         model.load_state_dict(torch.load("small_rnn_model_final.pth"))

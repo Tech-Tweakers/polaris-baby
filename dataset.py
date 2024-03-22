@@ -4,17 +4,20 @@ from config import Colors
 from config import CC, HP
 import numpy as np
 from gensim.models import Word2Vec
+from word2vec_model import Word2VecTrainer
 
 class TextDataset(Dataset):
     def __init__(self, context_window=10):
         with open('input.txt', 'r') as file:
             text = file.read()
-        print(f"{Colors.OKGREEN}Input text loaded. Length: {len(text)} characters.{Colors.ENDC}")
 
         self.vocab = sorted(list(set(text)))
         print(f"{Colors.OKGREEN}Vocabulary constructed. Size: {len(self.vocab)}. Vocabulary: {self.vocab[:10]}...{Colors.ENDC}")  # Show a sample of the vocabulary
 
-        # Load the trained Word2Vec model
+        print(f"{Colors.CYAN}Creating Word2Vec model...{Colors.ENDC}")
+        word2vec_trainer = Word2VecTrainer('input.txt', vector_size=HP['embed_dim'], window=5, min_count=3, workers=4)
+        word2vec_trainer.train_model()
+
         print(f"{Colors.CYAN}Loading Word2Vec model...{Colors.ENDC}")
         word2vec_model = Word2Vec.load("word2vec.model")
         print(f"{Colors.CYAN}Word2Vec model loaded. Vocabulary size: {len(word2vec_model.wv)}{Colors.ENDC}")
