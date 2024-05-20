@@ -22,7 +22,6 @@ class TextDataset(Dataset):
         word2vec_model = Word2Vec.load("word2vec.model")
         print(f"{Colors.CYAN}Word2Vec model loaded. Vocabulary size: {len(word2vec_model.wv)}{Colors.ENDC}")
 
-        # Preparing the weights matrix
         vocab_size = len(word2vec_model.wv)
         embed_dim = word2vec_model.vector_size
         weights_matrix = np.zeros((vocab_size, embed_dim))
@@ -31,7 +30,6 @@ class TextDataset(Dataset):
         for i, word in enumerate(word2vec_model.wv.index_to_key):
             weights_matrix[i] = word2vec_model.wv[word]
 
-        # Converting to a tensor for PyTorch
         weights_matrix = torch.tensor(weights_matrix, dtype=torch.float)
         print(f"{Colors.OKGREEN}Weights matrix converted to tensor. Shape: {weights_matrix.shape}{Colors.ENDC}")
 

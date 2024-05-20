@@ -3,6 +3,7 @@ import argparse
 import torch.nn.functional as F
 from config import Colors, HP
 from model import EnhancedRNNModel
+from gensim.models import Word2Vec
 
 def read_file(file_path):
     try:
@@ -68,7 +69,9 @@ def generate_text(seed_text, model, max_length, temperature=0.7, top_k=40, top_p
     return ''.join(text_generated)
 
 def main(args):
-    vocab_size = 1800
+    word2vec_model = Word2Vec.load("word2vec.model")
+    vocab_size = len(word2vec_model.wv)
+    
     embed_dim = HP['embed_dim']
     hidden_dim = HP['hidden_dim']
     dropout = HP['dropout']
