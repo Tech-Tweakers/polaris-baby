@@ -106,7 +106,7 @@ This repository provides a complete setup for processing text data, constructing
 ### TextDataset Class
 
 - **Vocabulary Construction**: Upon initialization, the class reads text from a file (input.txt), constructs a sorted vocabulary, and logs the vocabulary size and a preview of its contents using colored console outputs for clarity.
-Word2Vec Training and Loading: Integrates with a custom Word2VecTrainer class to train a Word2Vec model from the input text, subsequently loading the trained model to access word vectors.
+- **Word2Vec Training and Loading:** Integrates with a custom Word2VecTrainer class to train a Word2Vec model from the input text, subsequently loading the trained model to access word vectors.
 - **Embedding Preparation**: Generates a weight matrix for the vocabulary based on the embeddings from the Word2Vec model, converting it to a PyTorch tensor for further use in neural networks.
 - **Text Encoding**: Encodes the entire text using the vocabulary, converting characters to indices, which are then used to create sequences of a specified length (defined by context_window).
 
