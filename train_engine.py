@@ -5,7 +5,7 @@ from config import Colors
 import pandas as pd
 import os
 
-def train(model, dataloader, optimizer, scheduler, epochs, log_interval, start_epoch=0):
+def train(model, dataloader, optimizer, scheduler, epochs, log_interval, start_epoch=0, frequency_penalty_factor=0.001):
     checkpoint_path = "model_checkpoint.pth"
 
     if os.path.isfile(checkpoint_path):
@@ -35,6 +35,11 @@ def train(model, dataloader, optimizer, scheduler, epochs, log_interval, start_e
             optimizer.zero_grad()
             outputs = model(inputs)
             loss = criterion(outputs.transpose(1, 2), targets)
+            
+            # Calculate frequency penalty
+            freq_penalty = frequency_penalty_factor * compute_frequency_penalty(outputs, targets)
+            loss += freq_penalty
+            
             loss.backward()
             torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1)
             optimizer.step()
@@ -63,3 +68,13 @@ def train(model, dataloader, optimizer, scheduler, epochs, log_interval, start_e
         losses.append({'epoch': epoch, 'train_loss': avg_loss})
 
     return pd.DataFrame(losses)
+
+def compute_frequency_penalty(outputs, targets):
+    # Compute frequency of tokens in targets
+    token_freq = torch.bincount(targets.flatten(), minlength=outputs.size(-1))
+    # Normalize frequency to probabilities
+    token_prob = token_freq.float() / token_freq.sum()
+    # Compute penalty as negative log probability
+    penalty = -torch.log(token_prob + 1e-10)  # Adding epsilon to avoid log(0)
+    # Apply mean penalty
+    return penalty.mean()
