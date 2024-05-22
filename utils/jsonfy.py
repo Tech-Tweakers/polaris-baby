@@ -16,11 +16,10 @@ def process_conversation(input_file_path, output_file_path):
     for line in lines:
         line = line.strip()  # To remove extra spaces and newline characters
 
-        # if (line.startswith("User:") or line.startswith("Polaris:")):
-        # speaker, text = line.split(":", 1)
-        speaker = "Polaris"
-        # text = text.strip()
-        text = line
+        if (line.startswith("User:") or line.startswith("Polaris:")):
+            speaker, text = line.split(":", 1)
+            text = text.strip()
+            text = line
 
         if text.endswith("?"):
             structured_conversation.append({"from": speaker, "text": text, "type": "question"})
