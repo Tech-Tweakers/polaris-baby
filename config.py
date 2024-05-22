@@ -1,14 +1,15 @@
 HP = {
-    "embed_dim": 64,         # Embedding dimension: Size of the embedding vectors.
-    "hidden_dim": 128,        # Hidden dimension: Size of the hidden layers in the model.
-    "num_layers": 4,          # Number of layers: The number of layers in the model (e.g., in LSTM or Transformer models).
-    "num_heads": 16,          # Number of heads: The number of heads in the multi-head attention mechanism.
-    "learning_rate": 0.005,   # Learning rate: The step size at each iteration while moving toward a minimum of a loss function.
-    "epochs": 7,              # Epochs: The number of complete passes through the training dataset.
-    "batch_size": 128,         # Batch size: The number of training examples utilized in one iteration.
-    "context_window": 128,     # Context window: The size of the window of context used for models that require a fixed input size.
-    "log_interval": 128,       # Log interval: The interval (in iterations) at which training progress (e.g., loss) is logged.
-    "dropout": 0.5,           # Dropout: The probability of dropout for regularization in the model.
+    "embed_dim": 64,            # Embedding dimension: Size of the embedding vectors.
+    "hidden_dim": 128,          # Hidden dimension: Size of the hidden layers in the model.
+    "num_layers": 4,            # Number of layers: The number of layers in the model (e.g., in LSTM or Transformer models).
+    "num_heads": 16,            # Number of heads: The number of heads in the multi-head attention mechanism.
+    "learning_rate": 0.005,     # Learning rate: The step size at each iteration while moving toward a minimum of a loss function.
+    "epochs": 4,                # Epochs: The number of complete passes through the training dataset.
+    "batch_size": 256,          # Batch size: The number of training examples utilized in one iteration.
+    "context_window": 128,      # Context window: The size of the window of context used for models that require a fixed input size.
+    "log_interval": 64,         # Log interval: The interval (in iterations) at which training progress (e.g., loss) is logged.
+    "dropout": 0.25,            # Dropout: The probability of dropout for regularization in the model.
+    "freq_penalty": 0.01        # Frequency penalties
 }
 
 CC = {

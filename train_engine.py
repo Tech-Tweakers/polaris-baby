@@ -1,11 +1,11 @@
 import torch
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 from torch import nn
-from config import Colors
+from config import Colors, HP
 import pandas as pd
 import os
 
-def train(model, dataloader, optimizer, scheduler, epochs, log_interval, start_epoch=0, frequency_penalty_factor=0.001):
+def train(model, dataloader, optimizer, scheduler, epochs, log_interval, start_epoch=0, frequency_penalty_factor=HP['freq_penalty']):
     checkpoint_path = "model_checkpoint.pth"
 
     if os.path.isfile(checkpoint_path):
