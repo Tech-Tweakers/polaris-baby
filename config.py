@@ -4,13 +4,21 @@ HP = {
     "num_layers": 2,            # Number of layers: The number of layers in the model (e.g., in LSTM or Transformer models).
     "num_heads": 8,            # Number of heads: The number of heads in the multi-head attention mechanism.
     "learning_rate": 0.005,     # Learning rate: The step size at each iteration while moving toward a minimum of a loss function.
-    "epochs": 5,                # Epochs: The number of complete passes through the training dataset.
-    "batch_size": 128,          # Batch size: The number of training examples utilized in one iteration.
-    "context_window": 128,      # Context window: The size of the window of context used for models that require a fixed input size.
-    "log_interval": 128,         # Log interval: The interval (in iterations) at which training progress (e.g., loss) is logged.
-    "dropout": 0.0,            # Dropout: The probability of dropout for regularization in the model.
-    "freq_penalty": 0.01        # Frequency penalties
+    "epochs": 2,                # Epochs: The number of complete passes through the training dataset.
+    "batch_size": 32,          # Batch size: The number of training examples utilized in one iteration.
+    "context_window": 32,      # Context window: The size of the window of context used for models that require a fixed input size.
+    "log_interval": 32,         # Log interval: The interval (in iterations) at which training progress (e.g., loss) is logged.
+    "dropout": 0.25,            # Dropout: The probability of dropout for regularization in the model.
+    "freq_penalty": 0.009        # Frequency penalties
 }
+
+HP_configs = [
+    {'context_window': 8, 'batch_size': 8, 'embed_dim': 8, 'hidden_dim': 64, 'dropout': 0.4, 'num_layers': 2, 'num_heads': 8, 'learning_rate': 0.004, 'epochs': 3, 'log_interval': 8},
+    {'context_window': 16, 'batch_size': 16, 'embed_dim': 8, 'hidden_dim': 64, 'dropout': 0.3, 'num_layers': 2, 'num_heads': 8, 'learning_rate': 0.003, 'epochs': 3, 'log_interval': 16},
+    {'context_window': 32, 'batch_size': 32, 'embed_dim': 8, 'hidden_dim': 64, 'dropout': 0.2, 'num_layers': 2, 'num_heads': 8, 'learning_rate': 0.002, 'epochs': 3, 'log_interval': 32},
+    {'context_window': 64, 'batch_size': 64, 'embed_dim': 8, 'hidden_dim': 64, 'dropout': 0.1, 'num_layers': 2, 'num_heads': 8, 'learning_rate': 0.001, 'epochs': 3, 'log_interval': 64},
+    {'context_window': 128, 'batch_size': 128, 'embed_dim': 8, 'hidden_dim': 64, 'dropout': 0.0, 'num_layers': 2, 'num_heads': 8, 'learning_rate': 0.001, 'epochs': 3, 'log_interval': 128},
+]
 
 CC = {
     "vocab_size": None,
