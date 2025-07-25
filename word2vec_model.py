@@ -2,7 +2,7 @@ from gensim.models import Word2Vec
 from nltk.tokenize import sent_tokenize, word_tokenize
 import nltk
 from config import Colors
-nltk.download('punkt', quiet=True)
+nltk.download('punkt')
 
 class Word2VecTrainer:
     def __init__(self, input_file, vector_size=64, window=5, min_count=3, workers=4):

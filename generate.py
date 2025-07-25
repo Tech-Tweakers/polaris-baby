@@ -21,6 +21,7 @@ stoi = {ch: i for i, ch in enumerate(vocab)}
 
 def encode(s):
     return [stoi.get(ch, 0) for ch in s]
+
 def top_k_top_p_filtering(logits, top_k=40, top_p=0.5, filter_value=-float('Inf')):
     assert logits.dim() == 1 
 
@@ -41,14 +42,15 @@ def top_k_top_p_filtering(logits, top_k=40, top_p=0.5, filter_value=-float('Inf'
         logits[indices_to_remove] = filter_value
     return logits
 
-def generate_text(seed_text, model, max_length, temperature=0.7, top_k=40, top_p=0.3):
+def generate_text(seed_text, model, max_length, device, temperature=0.7, top_k=40, top_p=0.3):
     model.eval()
     text_generated = [seed_text]
-    input_eval = torch.tensor(encode(seed_text), dtype=torch.long).unsqueeze(0)
+
+    input_eval = torch.tensor(encode(seed_text), dtype=torch.long, device=device).unsqueeze(0)
 
     with torch.no_grad():
         for _ in range(max_length):
-            predictions = model(input_eval)[:,-1,:]
+            predictions = model(input_eval)[:, -1, :]  # Último token
             predictions = predictions / temperature
             filtered_logits = top_k_top_p_filtering(predictions.squeeze(), top_k=top_k, top_p=top_p)
             probs = F.softmax(filtered_logits, dim=-1)
@@ -61,7 +63,7 @@ def generate_text(seed_text, model, max_length, temperature=0.7, top_k=40, top_p
             generated_character = itos[predicted_id]
             print(generated_character, end='', flush=True)
 
-            predicted_id_tensor = torch.tensor([[predicted_id]], dtype=torch.long)
+            predicted_id_tensor = torch.tensor([[predicted_id]], dtype=torch.long, device=device)
             input_eval = torch.cat([input_eval, predicted_id_tensor], dim=1)
 
             text_generated.append(generated_character)
@@ -69,24 +71,30 @@ def generate_text(seed_text, model, max_length, temperature=0.7, top_k=40, top_p
     return ''.join(text_generated)
 
 def main(args):
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    print(f"{Colors.CYAN}Usando dispositivo para geração: {device}{Colors.ENDC}")
+
     word2vec_model = Word2Vec.load("word2vec.model")
     vocab_size = len(word2vec_model.wv)
-    
-    embed_dim = HP['embed_dim']
-    hidden_dim = HP['hidden_dim']
-    dropout = HP['dropout']
-    num_layers = HP['num_layers']
-    num_heads = HP['num_heads']
-    model = EnhancedRNNModel(vocab_size, embed_dim, hidden_dim, dropout, num_layers, num_heads)
+
+    model = EnhancedRNNModel(
+        vocab_size,
+        embed_dim=HP['embed_dim'],
+        hidden_dim=HP['hidden_dim'],
+        dropout=HP['dropout'],
+        num_layers=HP['num_layers'],
+        num_heads=HP['num_heads'],
+        pretrained_embeddings=None  # já embutido no checkpoint
+    ).to(device)
 
     try:
-        model.load_state_dict(torch.load("small_rnn_model_final.pth"))
+        model.load_state_dict(torch.load("small_rnn_model_final.pth", map_location=device))
         model.eval()
     except Exception as e:
         print(f"{Colors.FAIL}Error loading model: {e}{Colors.ENDC}")
         return
 
-    generate_text(args.seed_text, model, args.max_length, args.temperature, args.top_k, args.top_p)
+    generate_text(args.seed_text, model, args.max_length, device, args.temperature, args.top_k, args.top_p)
     print(f"\n")
 
 if __name__ == "__main__":
